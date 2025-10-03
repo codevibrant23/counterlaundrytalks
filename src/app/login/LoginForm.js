@@ -33,9 +33,9 @@ export default function LoginForm() {
         return;
       }
       // Set the cookie using react-cookie
-      setCookie("token", response.accessToken, {
+      setCookie("accessToken", response.accessToken, {
         path: "/",
-      }); // 1 day
+      });
 
       // Store user data in localStorage
       if (typeof window !== "undefined") {

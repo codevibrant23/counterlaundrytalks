@@ -35,16 +35,31 @@ const page = async ({ searchParams }) => {
               />
               <OutletInfo />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 text-sm">
               <QuickActions />
-              <Link href="/products" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link href="/products" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
                 Products
               </Link>
-              <Link href="/workshop" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link href="/workshop" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
                 Workshop
               </Link>
-              <Link href="/receive" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link href="/receive" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
                 Receive
+              </Link>
+              <Link href="/pickups" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                Pickups
+              </Link>
+              <Link href="/order-details" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                Orders
+              </Link>
+              <Link href="/cash-register" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                Cash
+              </Link>
+              <Link href="/printer-settings" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                Print
+              </Link>
+              <Link href="/settings" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                Settings
               </Link>
               <UserDetails />
             </div>

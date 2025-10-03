@@ -4,23 +4,23 @@ import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { mockCustomers, simulateApiDelay } from "./mockData";
 
-const baseUrl = process.env.baseURL;
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 const USE_MOCK_DATA = process.env.NODE_ENV === 'development' || !baseUrl;
 
 export const addCustomer = async (values) => {
   // Use mock data in development or when API is not available
   if (USE_MOCK_DATA) {
     await simulateApiDelay();
-    
+
     // Simulate adding customer to mock data
     const newCustomer = {
       ...values,
       id: Date.now(), // Simple ID generation
     };
-    
+
     // In a real app, you'd persist this to a database
     // For now, just return success
-    return { 
+    return {
       customer: newCustomer,
       success: true,
       message: "Customer added successfully"
@@ -48,13 +48,13 @@ export const addCustomer = async (values) => {
     console.log(e, "\n500: Falling back to mock data");
     // Fallback to mock behavior
     await simulateApiDelay();
-    
+
     const newCustomer = {
       ...values,
       id: Date.now(),
     };
-    
-    return { 
+
+    return {
       customer: newCustomer,
       success: true,
       message: "Customer added successfully"
@@ -96,7 +96,7 @@ export const placeOrder = async (values) => {
   // Use mock data in development or when API is not available
   if (USE_MOCK_DATA) {
     await simulateApiDelay();
-    
+
     // Generate mock order response
     const orderId = `ORD-${Date.now()}`;
     const mockOrderResponse = {
@@ -109,7 +109,7 @@ export const placeOrder = async (values) => {
       status: "confirmed",
       created_at: new Date().toISOString()
     };
-    
+
     return JSON.stringify(mockOrderResponse);
   }
 
@@ -134,7 +134,7 @@ export const placeOrder = async (values) => {
     console.log(e, "\n500: Falling back to mock data");
     // Fallback to mock behavior
     await simulateApiDelay();
-    
+
     const orderId = `ORD-${Date.now()}`;
     const mockOrderResponse = {
       order_id: orderId,
@@ -146,15 +146,22 @@ export const placeOrder = async (values) => {
       status: "confirmed",
       created_at: new Date().toISOString()
     };
-    
+
     return JSON.stringify(mockOrderResponse);
   }
 };
 
 export const authLogin = async (values) => {
+  if (!baseUrl) {
+    throw new Error("API base URL not configured. Please set NEXT_PUBLIC_BASE_URL in .env file.");
+  }
+
   const endpoint = "/v1/auth/auth/login/";
+  const url = baseUrl + endpoint;
+
   try {
-    const data = await fetch(baseUrl + endpoint, {
+    console.log('Attempting login to:', url);
+    const data = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -162,12 +169,17 @@ export const authLogin = async (values) => {
       body: JSON.stringify(values),
       cache: "no-store",
     });
+
+    if (!data.ok) {
+      throw new Error(`HTTP ${data.status}: ${data.statusText}`);
+    }
+
     const res = await data.json();
 
     if (res.error) {
       return {
         success: false,
-        message: res.detail,
+        message: res.detail || res.message || 'Login failed',
       };
     }
 
@@ -178,22 +190,22 @@ export const authLogin = async (values) => {
       name: "accessToken",
       value: res.token,
       path: "/",
-      httpOnly: true, // Secure the cookie
-      secure: true, // Ensure it's only sent over HTTPS
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
     });
     cookieStore.set({
       name: "userId",
       value: res.user_details.id,
       path: "/",
-      httpOnly: true, // Secure the cookie
-      secure: true, // Ensure it's only sent over HTTPS
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
     });
     cookieStore.set({
       name: "outletId",
       value: res.outlet_details.id,
       path: "/",
-      httpOnly: true, // Secure the cookie
-      secure: true, // Ensure it's only sent over HTTPS
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
     });
 
     return {
@@ -204,7 +216,10 @@ export const authLogin = async (values) => {
       outletData: res.outlet_details,
     };
   } catch (e) {
-    console.error(e, "\n500: login");
+    console.error('Login error:', e);
+    if (e.name === 'TypeError' && e.message.includes('fetch')) {
+      throw new Error(`Cannot connect to server at ${url}. Please check if the server is running and accessible.`);
+    }
     throw new Error(e.message ?? "Error during login. Internal Server Error!");
   }
 };
