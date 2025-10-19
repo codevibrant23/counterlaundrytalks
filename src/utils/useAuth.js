@@ -8,15 +8,10 @@ const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const router = useRouter();
   const cookies = new Cookies();
-  const token = cookies.get("accessToken");
+  const token = cookies.get("accessToken") || cookies.get("token");
 
   useEffect(() => {
-    // Bypass login in development
-    if (process.env.NODE_ENV === 'development') {
-      setIsAuthenticated(true);
-      return;
-    }
-
+    console.log('Auth check - token:', token);
     if (token) {
       setIsAuthenticated(true);
     } else {

@@ -161,6 +161,7 @@ export const authLogin = async (values) => {
 
   try {
     console.log('Attempting login to:', url);
+    console.log('Payload:', JSON.stringify(values));
     const data = await fetch(url, {
       method: "POST",
       headers: {
@@ -175,8 +176,9 @@ export const authLogin = async (values) => {
     }
 
     const res = await data.json();
+    console.log('API Response:', res);
 
-    if (res.error) {
+    if (res.error === true) {
       return {
         success: false,
         message: res.detail || res.message || 'Login failed',
@@ -187,6 +189,13 @@ export const authLogin = async (values) => {
     revalidateTag("categories");
     const cookieStore = cookies();
     cookieStore.set({
+      name: "token",
+      value: res.token,
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    });
+    cookieStore.set({
       name: "accessToken",
       value: res.token,
       path: "/",
@@ -195,14 +204,14 @@ export const authLogin = async (values) => {
     });
     cookieStore.set({
       name: "userId",
-      value: res.user_details.id,
+      value: res.user_details.id.toString(),
       path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
     });
     cookieStore.set({
       name: "outletId",
-      value: res.outlet_details.id,
+      value: res.outlet_details.id.toString(),
       path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -210,7 +219,7 @@ export const authLogin = async (values) => {
 
     return {
       success: true,
-      message: "Login successful",
+      message: res.detail || "Login successful",
       accessToken: res.token,
       userData: res.user_details,
       outletData: res.outlet_details,
@@ -230,4 +239,5 @@ export const logout = () => {
   cookieStore.delete("outletId");
   cookieStore.delete("userId");
   cookieStore.delete("accessToken");
+  cookieStore.delete("token");
 };

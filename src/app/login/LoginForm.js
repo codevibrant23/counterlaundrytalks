@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useCookies } from "react-cookie";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { authLogin } from "@/lib/actions";
@@ -12,14 +10,17 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const [cookies, setCookie] = useCookies(["accessToken"]); // Cookie hook for accessToken
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     setLoading(true);
-    setError(""); // Reset any previous errors
+    setError("");
+
+    const formData = new FormData();
+    formData.append('username', email);
+    formData.append('password', password);
+    formData.append('role', 'Counter Operator');
 
     try {
       const response = await authLogin({
@@ -27,27 +28,27 @@ export default function LoginForm() {
         password,
         role: "Counter Operator",
       });
-      if (!response.success) {
-        setError(response.message);
+      
+      if (!response?.success) {
+        setError(response?.message || 'Login failed');
         setLoading(false);
         return;
       }
-      // Set the cookie using react-cookie
-      setCookie("accessToken", response.accessToken, {
-        path: "/",
-      });
-
+      
       // Store user data in localStorage
       if (typeof window !== "undefined") {
-        // localStorage.setItem("accessToken", response.accessToken);
-        localStorage.setItem("userData", JSON.stringify(response.userData));
-        localStorage.setItem("outletData", JSON.stringify(response.outletData));
+        if (response.userData) {
+          localStorage.setItem("userData", JSON.stringify(response.userData));
+        }
+        if (response.outletData) {
+          localStorage.setItem("outletData", JSON.stringify(response.outletData));
+        }
       }
 
-      // Redirect after successful login
-      router.push("/");
+      // Redirect to dashboard
+      window.location.href = "/dashboard";
     } catch (e) {
-      setError(e.message); // Show error if login fails
+      setError(e.message);
       setLoading(false);
     }
   };
