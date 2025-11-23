@@ -5,8 +5,7 @@ import MenuList from "@/components/MenuList";
 import EnhancedCart from "@/components/EnhancedCart";
 import CustomerForm from "@/components/CustomerDetails";
 import Image from "next/image";
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+
 import dynamic from "next/dynamic";
 import OutletInfo from "@/components/OutletInfo";
 import QuickActions from "@/components/QuickActions";
@@ -17,13 +16,6 @@ const UserDetails = dynamic(() => import("@/components/UserDetails"), {
 });
 
 const page = async ({ searchParams }) => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("accessToken")?.value || cookieStore.get("token")?.value;
-  
-  if (!accessToken) {
-    redirect("/login");
-  }
-
   const activeCategory = searchParams.category || "";
   const searchTerm = searchParams.search || "";
 
@@ -33,49 +25,58 @@ const page = async ({ searchParams }) => {
         {/* Left Side - 60% Products Section */}
         <div className="w-3/5 p-4 flex flex-col overflow-y-auto">
           {/* Header with Logo and Outlet Info */}
-          <div className="w-full flex justify-between items-center pb-4">
-            <div className="flex items-center gap-4">
-              <Image
-                src="/new_logo.png"
-                alt="Laundry Talks Logo"
-                width={200}
-                height={40}
-              />
-              <OutletInfo />
-            </div>
-            <div className="flex items-center gap-1 text-sm">
-              <QuickActions />
-              <Link href="/products" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
-                Products
-              </Link>
-              <Link href="/workshop" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
-                Workshop
-              </Link>
-              <Link href="/receive" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
-                Receive
-              </Link>
-              <Link href="/pickups" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
-                Pickups
-              </Link>
-              <Link href="/order-details" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
-                Orders
-              </Link>
-              <Link href="/cash-register" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
-                Cash
-              </Link>
-              <Link href="/printer-settings" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
-                Print
-              </Link>
-              <Link href="/settings" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
-                Settings
-              </Link>
-              <Link href="/issues" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
-                Issues
-              </Link>
-              <Link href="/learning-centre" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
-                Help
-              </Link>
+          <div className="w-full pb-4">
+            {/* First Row - Logo and Outlet Info */}
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center gap-4">
+                <Image
+                  src="/new_logo.png"
+                  alt="Laundry Talks Logo"
+                  width={200}
+                  height={40}
+                />
+                <OutletInfo />
+              </div>
               <UserDetails />
+            </div>
+            
+            {/* Second Row - Navigation Links */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1 text-sm">
+                <QuickActions />
+                <Link href="/products" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                  Products
+                </Link>
+                <Link href="/workshop" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                  Workshop
+                </Link>
+                <Link href="/receive" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                  Receive
+                </Link>
+                <Link href="/pickups" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                  Pickups
+                </Link>
+                <Link href="/order-details" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                  Orders
+                </Link>
+              </div>
+              <div className="flex items-center gap-1 text-sm">
+                <Link href="/cash-register" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                  Cash
+                </Link>
+                <Link href="/printer-settings" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                  Print
+                </Link>
+                <Link href="/settings" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                  Settings
+                </Link>
+                <Link href="/issues" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                  Issues
+                </Link>
+                <Link href="/learning-centre" className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded">
+                  Help
+                </Link>
+              </div>
             </div>
           </div>
           
